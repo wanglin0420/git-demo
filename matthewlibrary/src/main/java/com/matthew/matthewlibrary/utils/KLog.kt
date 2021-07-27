@@ -153,12 +153,13 @@ object KLog {
         }
         val logStr = stringBuilder.toString()
         when (type) {
-            V -> Log.v(tag, logStr)
-            D -> Log.d(tag, logStr)
-            I -> Log.i(tag, logStr)
-            W -> Log.w(tag, logStr)
-            E -> Log.e(tag, logStr)
+//            V -> Log.v(tag, logStr)
+//            D -> Log.d(tag, logStr)
+//            I -> Log.i(tag, logStr)
+//            W -> Log.w(tag, logStr)
+//            E -> Log.e(tag, logStr)
             A -> Log.wtf(tag, logStr)
+            V,D,I,W,E-> log(type,tag,logStr)
             JSON -> {
                 if (TextUtils.isEmpty(msg)) {
                     Log.d(tag, "Empty or Null json content")
@@ -225,5 +226,33 @@ object KLog {
                 "╚═══════════════════════════════════════════════════════════════════════════════════════"
             )
         }
+    }
+    val maxLeng=3200
+    private fun log(type:Int,tag: String,logStr:String){
+        if (logStr.length<= maxLeng){
+            when (type){
+                V -> Log.v(tag, logStr)
+                D -> Log.d(tag, logStr)
+                I -> Log.i(tag, logStr)
+                W -> Log.w(tag, logStr)
+                E -> Log.e(tag, logStr)
+                A -> Log.wtf(tag, logStr)
+            }
+            return
+        }
+        log(type,tag,"╔═══════════════════════════════════════════════════════════════════════════════════════")
+        val chunkCount = logStr.length / maxLeng
+        var i = 0
+        while (i <= chunkCount) {
+            val max = maxLeng * (i + 1)
+            if (max >= logStr.length) {
+                log(type,tag, logStr.substring(maxLeng * i))
+            } else {
+                log(type,tag,logStr.substring(maxLeng * i, max))
+            }
+            i++
+        }
+        log(type,tag,"╚═══════════════════════════════════════════════════════════════════════════════════════")
+
     }
 }
